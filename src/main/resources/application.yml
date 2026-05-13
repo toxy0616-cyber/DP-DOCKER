@@ -1,0 +1,24 @@
+# Spring Boot 基础配置
+spring:
+  application:
+    # 应用名称
+    name: deepsuck-doctor
+  profiles:
+    active: dev
+  # Spring AI 与 Ollama 配置
+  ai:
+    ollama:
+      base-url: http://127.0.0.1:11434
+      chat:
+        # 本地 Ollama 中已经创建的模型名称
+        model: my-doctor:1.0.1.Release
+
+# MyBatis-Plus 配置
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: assign_id
+      update-strategy: not_empty
+  mapper-locations: classpath*:/mappers/*.xml

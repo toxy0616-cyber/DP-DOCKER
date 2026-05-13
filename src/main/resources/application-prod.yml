@@ -1,0 +1,8 @@
+# 生产环境服务配置
+server:
+  port: 9999
+
+# 日志级别配置
+logging:
+  level:
+    root: INFO

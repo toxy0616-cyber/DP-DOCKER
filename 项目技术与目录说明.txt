@@ -1,0 +1,105 @@
+项目名称：deepsuck-doctor
+
+一、项目定位
+这是一个基于 Spring Boot 的智能问诊演示项目。后端接收用户问题，调用本地 Ollama 大模型生成回答，通过 SSE（Server-Sent Events）把流式内容实时推送给前端页面，同时把用户提问和 AI 回复保存到 MySQL 中，供历史记录查询使用。
+
+二、项目使用的主要技术
+1. Java 21
+2. Maven
+3. Spring Boot 3.3.8
+4. Spring Web
+5. Spring AOP
+6. Spring AI Ollama
+7. Reactor Flux
+8. MyBatis-Plus
+9. MySQL
+10. Lombok
+11. SSE（Server-Sent Events）
+12. HTML + JavaScript
+13. Marked
+
+三、项目顶层目录作用
+1. .idea：IDEA 工程配置目录。
+2. .mvn：Maven Wrapper 相关目录。
+3. .tools：项目辅助工具目录。
+4. src：源码主目录。
+5. target：Maven 构建输出目录。
+6. pom.xml：Maven 依赖与构建配置文件。
+7. .gitignore：Git 忽略规则文件。
+
+四、src 目录分层说明
+1. src/main：主业务代码与运行资源目录。
+2. src/main/java：Java 源码目录。
+3. src/main/resources：配置、SQL、Mapper XML、静态页面与提示词资源目录。
+4. src/test：测试代码目录。
+5. src/test/java：测试类目录。
+
+五、src/main/java 下各分目录作用
+1. com/itzixi
+   放置全局配置类与切面类。
+   - CorsConfig：全局跨域配置。
+   - ServiceLogAspect：统计 Service 层方法执行时间。
+
+2. com/itzixi/Application
+   应用启动相关目录。
+   - Application：Spring Boot 启动入口。
+
+3. com/itzixi/Application/controller
+   控制器层，对外暴露 HTTP 接口。
+   - OllamaController：提供普通问答、流式问答、问诊聊天记录查询等接口。
+   - SSEcontroller：提供 SSE 建连、消息发送、广播、断开和在线人数统计接口。
+
+4. com/itzixi/bean
+   实体与请求对象目录。
+   - ChatEntity：前端发送问诊消息时使用的请求对象。
+   - ChatRecord：聊天记录实体，对应 chat_record 表。
+
+5. com/itzixi/mapper
+   数据访问层接口目录。
+   - ChatRecordMapper：聊天记录 Mapper。
+
+6. com/itzixi/service
+   业务接口层目录。
+   - ChatRecordService：聊天记录保存与查询接口。
+   - OllamaService：AI 对话与流式响应接口。
+
+7. com/itzixi/service/impl
+   业务实现层目录。
+   - ChatRecordServiceImpl：实现聊天记录入库与查询。
+   - OllamaServiceImpl：实现 AI 调用、流式输出、SSE 推送与聊天记录保存。
+
+8. com/itzixi/utils
+   工具类与枚举目录。
+   - ChatTypeEnum：区分用户消息和 AI 消息。
+   - SSEMsgType：定义 SSE 事件类型。
+   - SSEServer：统一管理 SSE 连接、消息发送和在线人数统计。
+
+六、src/main/resources 下各分目录与文件作用
+1. application.yml：全局配置文件，定义应用名称、活动环境、Ollama 地址与模型名、MyBatis-Plus 配置等。
+2. application-dev.yml：开发环境配置文件，定义端口、日志级别、数据库连接与连接池参数。
+3. application-prod.yml：生产环境配置文件。
+4. schema.sql：数据库初始化脚本，创建 chat_record 表。
+5. mappers/ChatRecordMapper.xml：聊天记录字段映射配置。
+6. static/pages/chat-doctor.html：聊天页面，负责发送消息、接收 SSE、展示 AI 回复。
+7. ollama：Ollama 相关资源占位文件。
+8. my_doctor_0_1：自定义医生角色提示词文件。
+9. my_doctor_0_2：增强版医生角色提示词文件，增加 HTML 输出要求。
+
+七、src/test/java 下文件作用
+1. com/itzixi/MyTest.java：StopWatch 示例测试类。
+
+八、核心业务流程总结
+1. 用户打开 chat-doctor.html 页面。
+2. 前端通过 /sse/connect 建立 SSE 长连接。
+3. 用户输入问题后，前端调用 /ollama/ai/doctor/stream3。
+4. 后端先保存用户消息到 chat_record 表。
+5. 后端调用 Ollama 模型进行流式推理。
+6. 每一段 AI 输出都通过 SSE 以 add 事件推送给前端。
+7. 前端持续拼接内容并渲染。
+8. AI 输出结束后，后端保存完整回复到数据库，并发送 finish 事件通知前端结束加载。
+
+九、当前项目特点
+1. 结构已经具备控制器、服务层、数据层和工具层分层。
+2. 使用 SSE 做流式问答，交互更接近真实聊天。
+3. 数据库存储用户与 AI 的聊天记录，便于历史查询。
+4. 项目当前存在部分中文注释乱码，建议统一使用 UTF-8 编码继续维护。
